@@ -20,18 +20,21 @@ A user will implement a search that has context about what they are looking for 
 If some of this information is missing, you should assume the user is open to any option.
 
 You are not allowed to make up any information about the rentals. If the user asks for information you do not have, you should respond with "I don't know".
-You should only respond with a JSON object with the following format:
-{
-  "address": "string",
-  "distance from drillfield in miles": "integer",
-  "rent_price": "integer",
-  "num_bedrooms": "integer",
-  "num_bathrooms": "integer"
-}
-You are only allowed to respond with this JSON object, and nothing else.
+You should only respond with a JSON array containing objects with the following format:
+[
+  {
+    "address": "string",
+    "distance_from_drillfield_in_miles": "integer",
+    "rent_price": "integer", 
+    "num_bedrooms": "integer",
+    "num_bathrooms": "integer"
+  }
+]
+You are only allowed to respond with this JSON array, and nothing else.
 Only ever respond with 3 rentals at once, if there is less than 3 rentals that match the user's search, you should respond with less than 3 rentals.
-If there are no rentals that match the user's search, you should respond with an empty list.
+If there are no rentals that match the user's search, you should respond with an empty array [].
 """
+
 def search_rentals(user_search): #This stores the search function using our context and given user search
     try:
         response = client.chat.completions.create(
@@ -53,7 +56,7 @@ def search_rentals(user_search): #This stores the search function using our cont
             return rentals
         except json.JSONDecodeError:
             print("Error: Response is not valid JSON")
-            return "Error: Response is not valid JSON"
+            return []  # Return empty array instead of error string
     except Exception as e:
         print(f"Error calling OpenAI API: {e}")
-        return "Error occurred while searching rentals."
+        return []  # Return empty array instead of error string
