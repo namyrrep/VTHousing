@@ -9,3 +9,7 @@ This project delivers 3 core features
 - Nodejs react to run locally
 - Python installed
 - pip install openai
+- .env file must be created
+
+# Creating .env file
+- currently the .env file contains OPEN_API_KEY=your_API_key
