@@ -9,6 +9,7 @@ This project delivers 3 core features
 - Nodejs react to run locally
 - Python installed
 - pip install openai
+- pip install python-dotenv
 - .env file must be created and put in your api key, information below
 
 # Creating .env file
