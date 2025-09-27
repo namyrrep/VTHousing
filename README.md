@@ -11,6 +11,7 @@ This project delivers 3 core features
 - pip install openai
 - pip install python-dotenv
 - .env file must be created and put in your api key, information below
+- npm install -g npm@11.6.1
 
 # Creating .env file
 - currently the .env file contains OPEN_API_KEY=your_API_key
