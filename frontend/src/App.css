@@ -6,18 +6,54 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #f5f5f5;
+}
+
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #861f41;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a02851;
+}
+
+/* Firefox Scrollbar Styling */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #861f41 #f1f1f1;
 }
 
 div#root {
   width: 100%;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
+  position: relative;
+  background-color: #f5f5f5;
 }
 
 #root {
   width: 100%;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
+  position: relative;
+  background-color: #f5f5f5;
 }
 
 .logo {
@@ -54,4 +90,129 @@ div#root {
 
 .read-the-docs {
   color: #888;
+}
+
+/* Enhanced To-Do System Styles */
+.task-priority-critical {
+  border-left: 4px solid #dc3545 !important;
+  background: linear-gradient(90deg, #dc354520 0%, transparent 30%);
+}
+
+.task-priority-high {
+  border-left: 4px solid #fd7e14 !important;
+  background: linear-gradient(90deg, #fd7e1420 0%, transparent 30%);
+}
+
+.task-priority-medium {
+  border-left: 4px solid #ffc107 !important;
+  background: linear-gradient(90deg, #ffc10720 0%, transparent 30%);
+}
+
+.task-priority-low {
+  border-left: 4px solid #28a745 !important;
+  background: linear-gradient(90deg, #28a74520 0%, transparent 30%);
+}
+
+.task-overdue {
+  animation: pulse-red 2s infinite;
+  box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
+}
+
+.task-due-soon {
+  animation: pulse-orange 2s infinite;
+  box-shadow: 0 0 10px rgba(253, 126, 20, 0.3);
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 10px rgba(220, 53, 69, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(220, 53, 69, 0.6); }
+  100% { box-shadow: 0 0 10px rgba(220, 53, 69, 0.3); }
+}
+
+@keyframes pulse-orange {
+  0% { box-shadow: 0 0 10px rgba(253, 126, 20, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(253, 126, 20, 0.6); }
+  100% { box-shadow: 0 0 10px rgba(253, 126, 20, 0.3); }
+}
+
+.status-badge-pulse {
+  animation: badge-pulse 1.5s infinite;
+}
+
+@keyframes badge-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.progress-bar-animate {
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.task-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
+}
+
+.task-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  z-index: 2;
+}
+
+/* Fix for layout and positioning */
+.main-app-container {
+  position: relative;
+  z-index: 0;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #f5f5f5;
+}
+
+.content-section {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
+  clear: both;
+  background: transparent;
+}
+
+/* Ensure proper stacking */
+.search-section {
+  position: relative;
+  z-index: 10;
+}
+
+.results-section {
+  position: relative;
+  z-index: 5;
+  background: transparent;
+}
+
+.todo-section {
+  position: relative;
+  z-index: 3;
+  background: transparent;
+}
+
+.max-rent-input {
+  caret-color: #ffffff;
+}
+
+.max-rent-input::placeholder {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+  .dashboard-analytics {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .task-list-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
