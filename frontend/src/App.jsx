@@ -567,7 +567,7 @@ function Home() {
                     outline: 'none',
                     transition: 'border-color 0.3s, background-color 0.3s',
                     boxSizing: 'border-box', 
-                    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                    backgroundColor: '#333',
                     color: '#ffffff',
                     caretColor: '#ffffff'
                   }}
