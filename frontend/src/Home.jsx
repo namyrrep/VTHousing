@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function DropdownMenu() {
@@ -37,8 +37,12 @@ function Home() {
   const [error, setError] = useState("");
 
   const handleSearch = async () => {
-    if (!search.trim()) {
-      setError("Please enter a search term");
+    // Check if we have at least some search criteria
+    const hasSearchText = search.trim();
+    const hasFilters = maxRent || minBeds || minBaths;
+    
+    if (!hasSearchText && !hasFilters) {
+      setError("Please enter a search term or select at least one filter");
       return;
     }
 
@@ -48,7 +52,7 @@ function Home() {
 
     try {
       // Build search query from user inputs
-      let searchQuery = search.trim();
+      let searchQuery = search.trim() || "rental apartments Blacksburg VA"; // Default if no search text
       
       if (maxRent) {
         searchQuery += ` under $${maxRent}`;
@@ -106,6 +110,47 @@ function Home() {
     setMinBaths("");
     setResults([]);
     setError("");
+  };
+
+  // Check if we can enable search button
+  const canSearch = search.trim() || maxRent || minBeds || minBaths;
+
+  // New function to search for actual site links for a specific address
+  const searchSpecificSites = async (address, propertyName) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/search-sites', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          address: address,
+          property_name: propertyName
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Site search results:', data);
+        return data;
+      }
+    } catch (error) {
+      console.error('Site search error:', error);
+    }
+    
+    return {};
+  };
+
+  // Helper function to generate fallback search URLs
+  const generateFallbackUrls = (rental) => {
+    const address = encodeURIComponent(rental.address + ' Blacksburg VA');
+    const propertyName = encodeURIComponent(rental.name_of_rental);
+    
+    return {
+      zillow: `https://www.zillow.com/homes/${address}_rb/`,
+      apartmentsCom: `https://www.apartments.com/search/${address}/`,
+      rentCom: `https://www.rent.com/virginia/blacksburg-apartments/`
+    };
   };
 
   return (
@@ -179,7 +224,7 @@ function Home() {
               color: '#ffffff',
               fontSize: 'clamp(1rem, 1.5vw, 1.1rem)'
             }}>
-              What are you looking for?
+              What are you looking for? (Optional)
             </label>
             <input
               type="text"
@@ -227,8 +272,9 @@ function Home() {
                   left: '12px', 
                   top: '50%', 
                   transform: 'translateY(-50%)', 
-                  color: '#ffffff',
-                  fontSize: 'clamp(1rem, 1.5vw, 1.2rem)'
+                  color: '#333',
+                  fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
+                  zIndex: 2
                 }}>
                   $
                 </span>
@@ -251,6 +297,7 @@ function Home() {
                   onFocus={e => e.target.style.borderColor = '#861f41'}
                   onBlur={e => e.target.style.borderColor = '#ddd'}
                   min="0"
+                  step="100"
                 />
               </div>
             </div>
@@ -336,7 +383,7 @@ function Home() {
           }}>
             <button
               onClick={handleSearch}
-              disabled={loading || !search.trim()}
+              disabled={loading || !canSearch}
               style={{
                 background: '#861f41',
                 color: '#861f41',
@@ -435,114 +482,278 @@ function Home() {
               gap: '1.5rem',
               width: '100%'
             }}>
-              {results.map((rental, index) => (
-                <div key={index} style={{ 
-                  backgroundColor: '#861f41', // Changed from 'white' to maroon
-                  border: '1px solid #861f41', // Darker maroon border
-                  padding: 'clamp(1rem, 2vw, 1.5rem)', 
-                  borderRadius: '10px',
-                  boxShadow: '0 2px 10px #333', // Maroon shadow
-                  boxSizing: 'border-box',
-                  width: '100%'
-                }}>
-                  <h4 style={{ 
-                    color: '#ffffff', // Changed to white for contras qt
-                    marginBottom: '0.5rem',
-                    fontSize: 'clamp(1.1rem, 1.8vw, 1.3rem)',
-                    wordBreak: 'break-word'
-                  }}>
-                    {rental.name_of_rental}
-                  </h4>
-                  <p style={{ 
-                    color: '#ffffff', // Light gray for address text
-                    marginBottom: '0.5rem',
-                    fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
-                    wordBreak: 'break-word'
-                  }}>
-                    📍 {rental.address}
-                  </p>
-                  <div style={{ 
-                    display: 'flex', 
-                    flexWrap: 'wrap', 
-                    gap: '0.5rem', 
-                    marginBottom: '1rem' 
-                  }}>
-                    <span style={{ 
-                      background: 'rgba(255, 255, 255, 0.15)', // Semi-transparent white badges
-                      color: '#ffffff',
-                      padding: '0.25rem 0.5rem', 
-                      borderRadius: '4px',
-                      fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      💰 ${rental.rent_price}/month
-                    </span>
-                    <span style={{ 
-                      background: 'rgba(255, 255, 255, 0.15)', // Semi-transparent white badges
-                      color: '#ffffff',
-                      padding: '0.25rem 0.5rem', 
-                      borderRadius: '4px',
-                      fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      🛏️ {rental.num_bedrooms} bed{rental.num_bedrooms !== 1 ? 's' : ''}
-                    </span>
-                    <span style={{ 
-                      background: 'rgba(255, 255, 255, 0.15)', // Semi-transparent white badges
-                      color: '#ffffff',
-                      padding: '0.25rem 0.5rem', 
-                      borderRadius: '4px',
-                      fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      🚿 {rental.num_bathrooms} bath{rental.num_bathrooms !== 1 ? 's' : ''}
-                    </span>
-                    <span style={{ 
-                      background: 'rgba(255, 255, 255, 0.15)', // Semi-transparent white badges
-                      color: '#ffffff',
-                      padding: '0.25rem 0.5rem', 
-                      borderRadius: '4px',
-                      fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      📏 {rental.distance_from_drillfield_in_miles} mile{rental.distance_from_drillfield_in_miles !== 1 ? 's' : ''} from Drillfield
-                    </span>
-                  </div>
-                  {rental.website_link && (
-                    <a 
-                      href={rental.website_link} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      style={{ 
-                        color: '#ffffff', // White text
-                        textDecoration: 'none', 
-                        fontWeight: 'bold',
-                        boxShadow: '0 4px 15px #333',
-                        border: '2px solid #ffffff', // White border
-                        backgroundColor: 'transparent',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '5px',
-                        display: 'inline-block',
-                        transition: 'all 0.3s',
-                        fontSize: 'clamp(0.9rem, 1.2vw, 1rem)'
-                      }}
-                      onMouseOver={e => {
-                        e.target.style.backgroundColor = '#ffffff';
-                        e.target.style.color = '#861f41';
-                        e.target.style.transform = 'translateY(0)';
-                      }}
-                      onMouseOut={e => {
-                        e.target.style.backgroundColor = 'transparent';
-                        e.target.style.color = '#ffffff';
-                        e.target.style.transform = 'translateY(-2px)';
-                      }}
-                    >
-                      View Listing →
-                    </a>
-                  )}
-                </div>
-              ))}
+              {results.map((rental, index) => {
+                // Create a component for each rental card with its own state
+                return <RentalCard key={index} rental={rental} searchSpecificSites={searchSpecificSites} generateFallbackUrls={generateFallbackUrls} />;
+              })}
             </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Separate component for each rental card to manage individual state
+function RentalCard({ rental, searchSpecificSites, generateFallbackUrls }) {
+  const [siteLinks, setSiteLinks] = useState({});
+  const [loadingSites, setLoadingSites] = useState(true);
+  
+  const fallbackUrls = generateFallbackUrls(rental);
+  
+  // Function to load specific site links for this rental
+  const loadSiteLinks = async () => {
+    try {
+      const links = await searchSpecificSites(rental.address, rental.name_of_rental);
+      setSiteLinks(links);
+    } catch (error) {
+      console.error('Error loading site links:', error);
+    }
+    setLoadingSites(false);
+  };
+
+  // Automatically load site links when component mounts
+  useEffect(() => {
+    loadSiteLinks();
+  }, []);
+
+  return (
+    <div style={{ 
+      backgroundColor: '#861f41',
+      border: '1px solid #861f41',
+      padding: 'clamp(1rem, 2vw, 1.5rem)', 
+      borderRadius: '10px',
+      boxShadow: '0 2px 10px #333',
+      boxSizing: 'border-box',
+      width: '100%'
+    }}>
+      <h4 style={{ 
+        color: '#ffffff',
+        marginBottom: '0.5rem',
+        fontSize: 'clamp(1.1rem, 1.8vw, 1.3rem)',
+        wordBreak: 'break-word'
+      }}>
+        {rental.name_of_rental}
+      </h4>
+      <p style={{ 
+        color: '#ffffff',
+        marginBottom: '0.5rem',
+        fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
+        wordBreak: 'break-word'
+      }}>
+        📍 {rental.address}
+      </p>
+      <div style={{ 
+        display: 'flex', 
+        flexWrap: 'wrap', 
+        gap: '0.5rem', 
+        marginBottom: '1rem' 
+      }}>
+        <span style={{ 
+          background: 'rgba(255, 255, 255, 0.15)',
+          color: '#ffffff',
+          padding: '0.25rem 0.5rem', 
+          borderRadius: '4px',
+          fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
+          whiteSpace: 'nowrap'
+        }}>
+          💰 ${rental.rent_price}/month
+        </span>
+        <span style={{ 
+          background: 'rgba(255, 255, 255, 0.15)',
+          color: '#ffffff',
+          padding: '0.25rem 0.5rem', 
+          borderRadius: '4px',
+          fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
+          whiteSpace: 'nowrap'
+        }}>
+          🛏️ {rental.num_bedrooms} bed{rental.num_bedrooms !== 1 ? 's' : ''}
+        </span>
+        <span style={{ 
+          background: 'rgba(255, 255, 255, 0.15)',
+          color: '#ffffff',
+          padding: '0.25rem 0.5rem', 
+          borderRadius: '4px',
+          fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
+          whiteSpace: 'nowrap'
+        }}>
+          🚿 {rental.num_bathrooms} bath{rental.num_bathrooms !== 1 ? 's' : ''}
+        </span>
+        <span style={{ 
+          background: 'rgba(255, 255, 255, 0.15)',
+          color: '#ffffff',
+          padding: '0.25rem 0.5rem', 
+          borderRadius: '4px',
+          fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
+          whiteSpace: 'nowrap'
+        }}>
+          📏 {rental.distance_from_drillfield_in_miles} mile{rental.distance_from_drillfield_in_miles !== 1 ? 's' : ''} from Drillfield
+        </span>
+      </div>
+      
+      {/* Site Links Section - now always show */}
+      <div style={{ 
+        display: 'flex', 
+        gap: '0.5rem', 
+        flexWrap: 'wrap',
+        marginBottom: '1rem'
+      }}>
+        {/* Original listing - always show if available */}
+        {rental.website_link && (
+          <a 
+            href={rental.website_link} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ 
+              color: '#ffffff',
+              textDecoration: 'none', 
+              fontWeight: 'bold',
+              border: '2px solid #ffffff',
+              backgroundColor: 'transparent',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '5px',
+              display: 'inline-block',
+              transition: 'all 0.3s',
+              fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
+              whiteSpace: 'nowrap'
+            }}
+            onMouseOver={e => {
+              e.target.style.backgroundColor = '#ffffff';
+              e.target.style.color = '#861f41';
+            }}
+            onMouseOut={e => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#ffffff';
+            }}
+          >
+            📄 Original
+          </a>
+        )}
+
+        {/* Show loading indicator while searching */}
+        {loadingSites && (
+          <div style={{ 
+            color: '#ffffff',
+            border: '2px solid #ffffff',
+            backgroundColor: 'transparent',
+            padding: '0.4rem 0.8rem',
+            borderRadius: '5px',
+            fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
+            whiteSpace: 'nowrap',
+            opacity: 0.7
+          }}>
+            🔄 Finding listings...
+          </div>
+        )}
+
+        {/* Zillow link - only show if found */}
+        {!loadingSites && siteLinks.zillow && (
+          <a 
+            href={siteLinks.zillow.url}
+            target="_blank" 
+            rel="noopener noreferrer"
+            title={siteLinks.zillow.title}
+            style={{ 
+              color: '#ffffff',
+              textDecoration: 'none', 
+              fontWeight: 'bold',
+              border: '2px solid #0074E4',
+              backgroundColor: 'transparent',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '5px',
+              display: 'inline-block',
+              transition: 'all 0.3s',
+              fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
+              whiteSpace: 'nowrap'
+            }}
+            onMouseOver={e => {
+              e.target.style.backgroundColor = '#0074E4';
+              e.target.style.color = '#ffffff';
+            }}
+            onMouseOut={e => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#ffffff';
+            }}
+          >
+            🏠 Zillow
+          </a>
+        )}
+
+        {/* Apartments.com link - only show if found */}
+        {!loadingSites && siteLinks.apartments_com && (
+          <a 
+            href={siteLinks.apartments_com.url}
+            target="_blank" 
+            rel="noopener noreferrer"
+            title={siteLinks.apartments_com.title}
+            style={{ 
+              color: '#ffffff',
+              textDecoration: 'none', 
+              fontWeight: 'bold',
+              border: '2px solid #E31837',
+              backgroundColor: 'transparent',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '5px',
+              display: 'inline-block',
+              transition: 'all 0.3s',
+              fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
+              whiteSpace: 'nowrap'
+            }}
+            onMouseOver={e => {
+              e.target.style.backgroundColor = '#E31837';
+              e.target.style.color = '#ffffff';
+            }}
+            onMouseOut={e => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#ffffff';
+            }}
+          >
+            🏢 Apartments.com
+          </a>
+        )}
+
+        {/* Rent.com link - only show if found */}
+        {!loadingSites && siteLinks.rent_com && (
+          <a 
+            href={siteLinks.rent_com.url}
+            target="_blank" 
+            rel="noopener noreferrer"
+            title={siteLinks.rent_com.title}
+            style={{ 
+              color: '#ffffff',
+              textDecoration: 'none', 
+              fontWeight: 'bold',
+              border: '2px solid #FF6B35',
+              backgroundColor: 'transparent',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '5px',
+              display: 'inline-block',
+              transition: 'all 0.3s',
+              fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
+              whiteSpace: 'nowrap'
+            }}
+            onMouseOver={e => {
+              e.target.style.backgroundColor = '#FF6B35';
+              e.target.style.color = '#ffffff';
+            }}
+            onMouseOut={e => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#ffffff';
+            }}
+          >
+            🏡 Rent.com
+          </a>
+        )}
+
+        {/* Show message if no additional listings found */}
+        {!loadingSites && !siteLinks.zillow && !siteLinks.apartments_com && !siteLinks.rent_com && (
+          <div style={{ 
+            color: 'rgba(255, 255, 255, 0.6)',
+            fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
+            fontStyle: 'italic',
+            padding: '0.4rem 0'
+          }}>
+            No additional listings found
           </div>
         )}
       </div>

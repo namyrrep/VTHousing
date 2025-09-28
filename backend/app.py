@@ -1,7 +1,5 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import sys
-import os
 
 # Import searchFunction from the same directory
 from searchFunction import search_rentals
@@ -38,6 +36,29 @@ def search_endpoint():
         
     except Exception as e:
         print(f"Error in search endpoint: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/search-sites', methods=['POST'])
+def search_sites_endpoint():
+    try:
+        data = request.get_json()
+        
+        if not data or 'address' not in data:
+            return jsonify({'error': 'Address is required'}), 400
+        
+        address = data['address']
+        property_name = data.get('property_name', '')
+        
+        print(f"Searching specific sites for address: {address}")
+        
+        # Import the search function
+        from searchFunction import search_specific_sites
+        results = search_specific_sites(address, property_name)
+        
+        return jsonify(results)
+        
+    except Exception as e:
+        print(f"Error in search sites endpoint: {e}")
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/api/health', methods=['GET'])
