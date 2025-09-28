@@ -7,16 +7,16 @@ function DropdownMenu() {
     <div style={{ position: 'fixed', top: 20, left: 20, zIndex: 1000 }}>
       <button
         style={{
-          background: '#861f41', color: '#fff', border: 'none', padding: '0.7em 1.2em', borderRadius: 6,
-          fontSize: '1.1em', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+          background: '#861f41', color: '#ffffff', border: 'none', padding: '0.7em 1.2em', borderRadius: 6,
+          fontSize: '1.1em', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 2px 8px #333'
         }}
         onClick={() => setOpen(!open)}
       >
-        ☰ Menu
+        ☰ Menu 
       </button>
       {open && (
         <div style={{
-          marginTop: 8, background: '#fff', border: '1px solid #ddd', borderRadius: 6, boxShadow: '0 2px 12px rgba(0,0,0,0.10)',
+          marginTop: 8, background: '#ddd', border: '1px solid #ddd', borderRadius: 6, boxShadow: '0 2px 12px #333',
           minWidth: 140, display: 'flex', flexDirection: 'column', padding: '0.5em 0'
         }}>
           <Link to="/Checklist" style={{ color: '#861f41', textDecoration: 'none', padding: '0.7em 1.2em', fontSize: '1em' }} onClick={() => setOpen(false)}>Checklist</Link>
@@ -114,7 +114,7 @@ function Home() {
       width: '100vw',
       margin: 0,
       padding: 0,
-      backgroundColor: '#f8f9fa', 
+      backgroundColor: '#ddd', 
       paddingBottom: '2rem',
       boxSizing: 'border-box',
       overflow: 'hidden' // Prevent horizontal scroll
@@ -141,7 +141,7 @@ function Home() {
         </h1>
         <p style={{ 
           fontSize: 'clamp(1rem, 2vw, 1.2rem)', 
-          color: '#666', 
+          color: '#333', 
           marginBottom: '2rem',
           margin: '0 0 2rem 0'
         }}>
@@ -163,9 +163,9 @@ function Home() {
           width: '100%',
           maxWidth: '100%',
           padding: 'clamp(1rem, 3vw, 2rem)', 
-          backgroundColor: 'white', 
+          backgroundColor: '#861f41', 
           borderRadius: '15px', 
-          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          boxShadow: '0 4px 20px #333',
           marginBottom: '2rem',
           boxSizing: 'border-box'
         }}>
@@ -176,7 +176,7 @@ function Home() {
               display: 'block', 
               fontWeight: 'bold', 
               marginBottom: '0.5rem', 
-              color: '#333',
+              color: '#ffffff',
               fontSize: 'clamp(1rem, 1.5vw, 1.1rem)'
             }}>
               What are you looking for?
@@ -192,13 +192,13 @@ function Home() {
                 fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
                 padding: 'clamp(0.75rem, 1.5vw, 1rem)',
                 borderRadius: '10px',
-                border: '2px solid #ddd',
+                border: '2px solid #ddd', 
                 outline: 'none',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                boxShadow: '0 2px 8px #333',
                 transition: 'border-color 0.3s',
                 boxSizing: 'border-box'
               }}
-              onFocus={e => e.target.style.borderColor = '#861f41'}
+              onFocus={e => e.target.style.borderColor = '#333'}
               onBlur={e => e.target.style.borderColor = '#ddd'}
             />
           </div>
@@ -216,7 +216,7 @@ function Home() {
                 display: 'block', 
                 fontWeight: 'bold', 
                 marginBottom: '0.5rem', 
-                color: '#333',
+                color: '#ffffff',
                 fontSize: 'clamp(0.9rem, 1.2vw, 1rem)'
               }}>
                 Maximum Rent
@@ -227,7 +227,7 @@ function Home() {
                   left: '12px', 
                   top: '50%', 
                   transform: 'translateY(-50%)', 
-                  color: '#666',
+                  color: '#ffffff',
                   fontSize: 'clamp(1rem, 1.5vw, 1.2rem)'
                 }}>
                   $
@@ -246,7 +246,7 @@ function Home() {
                     textAlign: 'left',
                     outline: 'none',
                     transition: 'border-color 0.3s',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box', 
                   }}
                   onFocus={e => e.target.style.borderColor = '#861f41'}
                   onBlur={e => e.target.style.borderColor = '#ddd'}
@@ -260,7 +260,7 @@ function Home() {
                 display: 'block', 
                 fontWeight: 'bold', 
                 marginBottom: '0.5rem', 
-                color: '#333',
+                color: '#ffffff',
                 fontSize: 'clamp(0.9rem, 1.2vw, 1rem)'
               }}>
                 Minimum Bedrooms
@@ -274,7 +274,7 @@ function Home() {
                   padding: 'clamp(0.6rem, 1.2vw, 0.75rem)', 
                   borderRadius: '8px', 
                   border: '2px solid #ddd',
-                  backgroundColor: 'white',
+                  backgroundColor: '#333',
                   outline: 'none',
                   transition: 'border-color 0.3s',
                   boxSizing: 'border-box'
@@ -295,7 +295,7 @@ function Home() {
                 display: 'block', 
                 fontWeight: 'bold', 
                 marginBottom: '0.5rem', 
-                color: '#333',
+                color: '#ffffff',
                 fontSize: 'clamp(0.9rem, 1.2vw, 1rem)'
               }}>
                 Minimum Bathrooms
@@ -309,7 +309,7 @@ function Home() {
                   padding: 'clamp(0.6rem, 1.2vw, 0.75rem)', 
                   borderRadius: '8px', 
                   border: '2px solid #ddd',
-                  backgroundColor: 'white',
+                  backgroundColor: '#333',
                   outline: 'none',
                   transition: 'border-color 0.3s',
                   boxSizing: 'border-box'
@@ -338,29 +338,31 @@ function Home() {
               onClick={handleSearch}
               disabled={loading || !search.trim()}
               style={{
-                background: loading || !search.trim() ? '#ccc' : '#861f41',
-                color: '#fff',
-                border: 'none',
+                background: '#861f41',
+                color: '#861f41',
+                border: '2px solid #ffffff',
                 padding: 'clamp(0.8rem, 1.5vw, 1rem) clamp(1.5rem, 3vw, 2rem)',
                 borderRadius: '10px',
                 fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
-                cursor: loading || !search.trim() ? 'not-allowed' : 'pointer',
+                cursor: 'pointer',
                 fontWeight: 'bold',
-                boxShadow: '0 4px 15px rgba(134, 31, 65, 0.3)',
+                boxShadow: '0 4px 15px #333',
                 transition: 'all 0.3s',
                 minWidth: 'clamp(120px, 20vw, 150px)',
                 flex: '1 1 auto',
                 maxWidth: '200px'
               }}
-              onMouseOver={e => {
-                if (!loading && search.trim()) {
-                  e.target.style.backgroundColor = '#6d1a35';
-                  e.target.style.transform = 'translateY(-2px)';
-                }
-              }}
               onMouseOut={e => {
                 if (!loading && search.trim()) {
                   e.target.style.backgroundColor = '#861f41';
+                  e.target.style.color = '#ffffff';
+                  e.target.style.transform = 'translateY(-2px)';
+                }
+              }}  
+              onMouseOver={e => {
+                if (!loading && search.trim()) {
+                  e.target.style.backgroundColor = '#ffffff';
+                  e.target.style.color = '#861f41';
                   e.target.style.transform = 'translateY(0)';
                 }
               }}
@@ -373,23 +375,26 @@ function Home() {
               style={{
                 background: 'transparent',
                 color: '#861f41',
-                border: '2px solid #861f41',
+                border: '2px solid #ffffff',
                 padding: 'clamp(0.8rem, 1.5vw, 1rem) clamp(1.5rem, 3vw, 2rem)',
                 borderRadius: '10px',
                 fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
                 cursor: 'pointer',
                 fontWeight: 'bold',
+                boxShadow: '0 4px 15px #333',
                 transition: 'all 0.3s',
                 flex: '1 1 auto',
                 maxWidth: '200px'
               }}
               onMouseOver={e => {
-                e.target.style.backgroundColor = '#861f41';
-                e.target.style.color = 'white';
+                e.target.style.backgroundColor = '#ffffff';
+                e.target.style.color = '#861f41';
+                e.target.style.transform = 'translateY(0)';
               }}
               onMouseOut={e => {
                 e.target.style.backgroundColor = 'transparent';
-                e.target.style.color = '#861f41';
+                e.target.style.color = '#ffffff';
+                e.target.style.transform = 'translateY(-2px)';
               }}
             >
               Clear
@@ -432,16 +437,16 @@ function Home() {
             }}>
               {results.map((rental, index) => (
                 <div key={index} style={{ 
-                  backgroundColor: 'white', 
-                  border: '1px solid #ddd', 
+                  backgroundColor: '#861f41', // Changed from 'white' to maroon
+                  border: '1px solid #861f41', // Darker maroon border
                   padding: 'clamp(1rem, 2vw, 1.5rem)', 
                   borderRadius: '10px',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+                  boxShadow: '0 2px 10px #333', // Maroon shadow
                   boxSizing: 'border-box',
                   width: '100%'
                 }}>
                   <h4 style={{ 
-                    color: '#861f41', 
+                    color: '#ffffff', // Changed to white for contras qt
                     marginBottom: '0.5rem',
                     fontSize: 'clamp(1.1rem, 1.8vw, 1.3rem)',
                     wordBreak: 'break-word'
@@ -449,7 +454,7 @@ function Home() {
                     {rental.name_of_rental}
                   </h4>
                   <p style={{ 
-                    color: '#666', 
+                    color: '#ffffff', // Light gray for address text
                     marginBottom: '0.5rem',
                     fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
                     wordBreak: 'break-word'
@@ -463,7 +468,8 @@ function Home() {
                     marginBottom: '1rem' 
                   }}>
                     <span style={{ 
-                      background: '#f0f8ff', 
+                      background: 'rgba(255, 255, 255, 0.15)', // Semi-transparent white badges
+                      color: '#ffffff',
                       padding: '0.25rem 0.5rem', 
                       borderRadius: '4px',
                       fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
@@ -472,7 +478,8 @@ function Home() {
                       💰 ${rental.rent_price}/month
                     </span>
                     <span style={{ 
-                      background: '#f0f8ff', 
+                      background: 'rgba(255, 255, 255, 0.15)', // Semi-transparent white badges
+                      color: '#ffffff',
                       padding: '0.25rem 0.5rem', 
                       borderRadius: '4px',
                       fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
@@ -481,7 +488,8 @@ function Home() {
                       🛏️ {rental.num_bedrooms} bed{rental.num_bedrooms !== 1 ? 's' : ''}
                     </span>
                     <span style={{ 
-                      background: '#f0f8ff', 
+                      background: 'rgba(255, 255, 255, 0.15)', // Semi-transparent white badges
+                      color: '#ffffff',
                       padding: '0.25rem 0.5rem', 
                       borderRadius: '4px',
                       fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
@@ -490,7 +498,8 @@ function Home() {
                       🚿 {rental.num_bathrooms} bath{rental.num_bathrooms !== 1 ? 's' : ''}
                     </span>
                     <span style={{ 
-                      background: '#f0f8ff', 
+                      background: 'rgba(255, 255, 255, 0.15)', // Semi-transparent white badges
+                      color: '#ffffff',
                       padding: '0.25rem 0.5rem', 
                       borderRadius: '4px',
                       fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
@@ -505,10 +514,12 @@ function Home() {
                       target="_blank" 
                       rel="noopener noreferrer"
                       style={{ 
-                        color: '#861f41', 
+                        color: '#ffffff', // White text
                         textDecoration: 'none', 
                         fontWeight: 'bold',
-                        border: '1px solid #861f41',
+                        boxShadow: '0 4px 15px #333',
+                        border: '2px solid #ffffff', // White border
+                        backgroundColor: 'transparent',
                         padding: '0.5rem 1rem',
                         borderRadius: '5px',
                         display: 'inline-block',
@@ -516,12 +527,14 @@ function Home() {
                         fontSize: 'clamp(0.9rem, 1.2vw, 1rem)'
                       }}
                       onMouseOver={e => {
-                        e.target.style.backgroundColor = '#861f41';
-                        e.target.style.color = 'white';
+                        e.target.style.backgroundColor = '#ffffff';
+                        e.target.style.color = '#861f41';
+                        e.target.style.transform = 'translateY(0)';
                       }}
                       onMouseOut={e => {
                         e.target.style.backgroundColor = 'transparent';
-                        e.target.style.color = '#861f41';
+                        e.target.style.color = '#ffffff';
+                        e.target.style.transform = 'translateY(-2px)';
                       }}
                     >
                       View Listing →
