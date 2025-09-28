@@ -1,32 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-function DropdownMenu() {
-  const [open, setOpen] = useState(false);
-  return (
-    <div style={{ position: 'fixed', top: 20, left: 20, zIndex: 1000 }}>
-      <button
-        style={{
-          background: '#861f41', color: '#ffffff', border: 'none', padding: '0.7em 1.2em', borderRadius: 6,
-          fontSize: '1.1em', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 2px 8px #333'
-        }}
-        onClick={() => setOpen(!open)}
-      >
-        ☰ Menu 
-      </button>
-      {open && (
-        <div style={{
-          marginTop: 8, background: '#ddd', border: '1px solid #ddd', borderRadius: 6, boxShadow: '0 2px 12px #333',
-          minWidth: 140, display: 'flex', flexDirection: 'column', padding: '0.5em 0'
-        }}>
-          <Link to="/Checklist" style={{ color: '#861f41', textDecoration: 'none', padding: '0.7em 1.2em', fontSize: '1em' }} onClick={() => setOpen(false)}>Checklist</Link>
-          <Link to="/Prompt" style={{ color: '#861f41', textDecoration: 'none', padding: '0.7em 1.2em', fontSize: '1em' }} onClick={() => setOpen(false)}>Prompt</Link>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function Home() {
   const [search, setSearch] = useState("");
   const [maxRent, setMaxRent] = useState("");
@@ -162,17 +136,16 @@ function Home() {
       backgroundColor: '#ddd', 
       paddingBottom: '2rem',
       boxSizing: 'border-box',
-      overflow: 'hidden' // Prevent horizontal scroll
+      overflowX: 'hidden' // Only prevent horizontal scroll
     }}>
-      <DropdownMenu />
       
       {/* Header */}
       <div style={{ 
         textAlign: 'center', 
-        paddingTop: '4rem', 
-        marginBottom: '3rem',
+        paddingTop: '2rem', // Reduced from 4rem since no menu
+        marginBottom: '2rem', // Reduced from 3rem
         width: '100%',
-        padding: '4rem 1rem 3rem 1rem'
+        padding: '2rem 1rem 2rem 1rem' // Reduced top padding
       }}>
         <h1 style={{ 
           fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', 
@@ -187,8 +160,8 @@ function Home() {
         <p style={{ 
           fontSize: 'clamp(1rem, 2vw, 1.2rem)', 
           color: '#333', 
-          marginBottom: '2rem',
-          margin: '0 0 2rem 0'
+          marginBottom: '1.5rem', // Reduced from 2rem
+          margin: '0 0 1.5rem 0'
         }}>
           Find your perfect rental near Virginia Tech
         </p>
