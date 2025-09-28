@@ -9,6 +9,9 @@ function Home() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  // New state for to-do list functionality
+  const [appliedRentals, setAppliedRentals] = useState({});
 
   const handleSearch = async () => {
     // Check if we have at least some search criteria
@@ -84,6 +87,7 @@ function Home() {
     setMinBaths("");
     setResults([]);
     setError("");
+    // Note: We do NOT clear appliedRentals here - they persist!
   };
 
   // Check if we can enable search button
@@ -125,6 +129,60 @@ function Home() {
       apartmentsCom: `https://www.apartments.com/search/${address}/`,
       rentCom: `https://www.rent.com/virginia/blacksburg-apartments/`
     };
+  };
+
+  // Function to handle applying for a rental
+  const handleApply = (rental) => {
+    const rentalKey = `${rental.name_of_rental}_${rental.address}`;
+    
+    if (!appliedRentals[rentalKey]) {
+      const defaultTasks = [
+        { id: 1, task: "Research the property and neighborhood", completed: false },
+        { id: 2, task: "Schedule a viewing/tour", completed: false },
+        { id: 3, task: "Gather required documents (ID, income proof, references)", completed: false },
+        { id: 4, task: "Check credit score and get credit report", completed: false },
+        { id: 5, task: "Calculate total monthly costs (rent + utilities + fees)", completed: false },
+        { id: 6, task: "Read lease agreement thoroughly", completed: false },
+        { id: 7, task: "Submit rental application", completed: false },
+        { id: 8, task: "Pay application fee (if required)", completed: false },
+        { id: 9, task: "Follow up on application status", completed: false },
+        { id: 10, task: "Secure renter's insurance", completed: false },
+        { id: 11, task: "Plan move-in logistics", completed: false }
+      ];
+
+      setAppliedRentals(prev => ({
+        ...prev,
+        [rentalKey]: {
+          rental: rental,
+          tasks: defaultTasks,
+          appliedDate: new Date().toLocaleDateString()
+        }
+      }));
+    }
+  };
+
+  // Function to toggle task completion
+  const toggleTask = (rentalKey, taskId) => {
+    setAppliedRentals(prev => ({
+      ...prev,
+      [rentalKey]: {
+        ...prev[rentalKey],
+        tasks: prev[rentalKey].tasks.map(task => 
+          task.id === taskId 
+            ? { ...task, completed: !task.completed }
+            : task
+        )
+      }
+    }));
+  };
+
+  // Function to remove a rental from applied list
+  const removeAppliedRental = (rentalKey) => {
+    setAppliedRentals(prev => {
+      const newState = { ...prev };
+      delete newState[rentalKey];
+      return newState;
+    });
   };
 
   return (
@@ -456,9 +514,46 @@ function Home() {
               width: '100%'
             }}>
               {results.map((rental, index) => {
-                // Create a component for each rental card with its own state
-                return <RentalCard key={index} rental={rental} searchSpecificSites={searchSpecificSites} generateFallbackUrls={generateFallbackUrls} />;
+                return <RentalCard 
+                  key={index} 
+                  rental={rental} 
+                  searchSpecificSites={searchSpecificSites} 
+                  generateFallbackUrls={generateFallbackUrls}
+                  onApply={() => handleApply(rental)}
+                  isApplied={!!appliedRentals[`${rental.name_of_rental}_${rental.address}`]}
+                />;
               })}
+            </div>
+          </div>
+        )}
+
+        {/* To-Do List Section */}
+        {Object.keys(appliedRentals).length > 0 && (
+          <div style={{ width: '100%', marginTop: '3rem' }}>
+            <h3 style={{ 
+              color: '#861f41', 
+              marginBottom: '1.5rem', 
+              fontSize: 'clamp(1.2rem, 2vw, 1.5rem)',
+              textAlign: 'center'
+            }}>
+              My Application To-Do List ({Object.keys(appliedRentals).length} Properties)
+            </h3>
+            
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '2rem',
+              width: '100%'
+            }}>
+              {Object.entries(appliedRentals).map(([rentalKey, data]) => (
+                <ToDoCard 
+                  key={rentalKey}
+                  rentalKey={rentalKey}
+                  data={data}
+                  onToggleTask={(taskId) => toggleTask(rentalKey, taskId)}
+                  onRemove={() => removeAppliedRental(rentalKey)}
+                />
+              ))}
             </div>
           </div>
         )}
@@ -467,8 +562,8 @@ function Home() {
   );
 }
 
-// Separate component for each rental card to manage individual state
-function RentalCard({ rental, searchSpecificSites, generateFallbackUrls }) {
+// Updated RentalCard component with Apply button
+function RentalCard({ rental, searchSpecificSites, generateFallbackUrls, onApply, isApplied }) {
   const [siteLinks, setSiteLinks] = useState({});
   const [loadingSites, setLoadingSites] = useState(true);
   
@@ -500,6 +595,7 @@ function RentalCard({ rental, searchSpecificSites, generateFallbackUrls }) {
       boxSizing: 'border-box',
       width: '100%'
     }}>
+      {/* Property Info */}
       <h4 style={{ 
         color: '#ffffff',
         marginBottom: '0.5rem',
@@ -516,6 +612,8 @@ function RentalCard({ rental, searchSpecificSites, generateFallbackUrls }) {
       }}>
         📍 {rental.address}
       </p>
+      
+      {/* Property Details */}
       <div style={{ 
         display: 'flex', 
         flexWrap: 'wrap', 
@@ -564,7 +662,7 @@ function RentalCard({ rental, searchSpecificSites, generateFallbackUrls }) {
         </span>
       </div>
       
-      {/* Site Links Section - now always show */}
+      {/* Site Links Section */}
       <div style={{ 
         display: 'flex', 
         gap: '0.5rem', 
@@ -729,6 +827,198 @@ function RentalCard({ rental, searchSpecificSites, generateFallbackUrls }) {
             No additional listings found
           </div>
         )}
+      </div>
+
+      {/* Apply Button */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'flex-end',
+        marginTop: '1rem'
+      }}>
+        <button
+          onClick={onApply}
+          disabled={isApplied}
+          style={{
+            background: isApplied ? 'rgba(255, 255, 255, 0.3)' : '#ffffff',
+            color: isApplied ? 'rgba(255, 255, 255, 0.7)' : '#861f41',
+            border: '2px solid #ffffff',
+            padding: '0.5rem 1rem',
+            borderRadius: '8px',
+            fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
+            cursor: isApplied ? 'not-allowed' : 'pointer',
+            fontWeight: 'bold',
+            transition: 'all 0.3s'
+          }}
+        >
+          {isApplied ? '✓ Applied' : 'Apply'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// New ToDoCard component
+function ToDoCard({ rentalKey, data, onToggleTask, onRemove }) {
+  const completedTasks = data.tasks.filter(task => task.completed).length;
+  const totalTasks = data.tasks.length;
+  const progressPercentage = (completedTasks / totalTasks) * 100;
+
+  return (
+    <div style={{
+      backgroundColor: '#ffffff',
+      border: '2px solid #861f41',
+      borderRadius: '15px',
+      padding: '1.5rem',
+      boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+      boxSizing: 'border-box'
+    }}>
+      {/* Header */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start',
+        marginBottom: '1rem',
+        flexWrap: 'wrap',
+        gap: '1rem'
+      }}>
+        <div style={{ flex: 1, minWidth: '200px' }}>
+          <h4 style={{ 
+            color: '#861f41', 
+            margin: '0 0 0.5rem 0',
+            fontSize: 'clamp(1.1rem, 1.8vw, 1.3rem)',
+            wordBreak: 'break-word'
+          }}>
+            {data.rental.name_of_rental}
+          </h4>
+          <p style={{ 
+            color: '#666', 
+            margin: '0 0 0.5rem 0',
+            fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
+            wordBreak: 'break-word'
+          }}>
+            📍 {data.rental.address}
+          </p>
+          <p style={{ 
+            color: '#888', 
+            margin: 0,
+            fontSize: 'clamp(0.8rem, 1vw, 0.9rem)'
+          }}>
+            Applied: {data.appliedDate}
+          </p>
+        </div>
+        
+        <button
+          onClick={onRemove}
+          style={{
+            background: 'transparent',
+            color: '#dc3545',
+            border: '2px solid #dc3545',
+            borderRadius: '8px',
+            padding: '0.5rem 1rem',
+            cursor: 'pointer',
+            fontSize: 'clamp(0.8rem, 1vw, 0.9rem)',
+            fontWeight: 'bold',
+            transition: 'all 0.3s'
+          }}
+          onMouseOver={e => {
+            e.target.style.backgroundColor = '#dc3545';
+            e.target.style.color = '#ffffff';
+          }}
+          onMouseOut={e => {
+            e.target.style.backgroundColor = 'transparent';
+            e.target.style.color = '#dc3545';
+          }}
+        >
+          Remove
+        </button>
+      </div>
+
+      {/* Progress Bar */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginBottom: '0.5rem'
+        }}>
+          <span style={{ 
+            color: '#861f41', 
+            fontWeight: 'bold',
+            fontSize: 'clamp(0.9rem, 1.2vw, 1rem)'
+          }}>
+            Progress: {completedTasks}/{totalTasks} tasks completed
+          </span>
+          <span style={{ 
+            color: '#861f41', 
+            fontWeight: 'bold',
+            fontSize: 'clamp(0.9rem, 1.2vw, 1rem)'
+          }}>
+            {Math.round(progressPercentage)}%
+          </span>
+        </div>
+        <div style={{
+          width: '100%',
+          height: '10px',
+          backgroundColor: '#f0f0f0',
+          borderRadius: '5px',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            width: `${progressPercentage}%`,
+            height: '100%',
+            backgroundColor: '#28a745',
+            transition: 'width 0.3s ease'
+          }} />
+        </div>
+      </div>
+
+      {/* Task List */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '0.75rem'
+      }}>
+        {data.tasks.map(task => (
+          <div
+            key={task.id}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.75rem',
+              backgroundColor: task.completed ? '#f8f9fa' : '#ffffff',
+              border: `2px solid ${task.completed ? '#28a745' : '#e9ecef'}`,
+              borderRadius: '8px',
+              transition: 'all 0.3s',
+              cursor: 'pointer'
+            }}
+            onClick={() => onToggleTask(task.id)}
+          >
+            <div style={{
+              width: '20px',
+              height: '20px',
+              borderRadius: '4px',
+              border: `2px solid ${task.completed ? '#28a745' : '#ddd'}`,
+              backgroundColor: task.completed ? '#28a745' : 'transparent',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              {task.completed && (
+                <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>✓</span>
+              )}
+            </div>
+            <span style={{
+              color: task.completed ? '#6c757d' : '#333',
+              textDecoration: task.completed ? 'line-through' : 'none',
+              fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
+              flex: 1
+            }}>
+              {task.task}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );
