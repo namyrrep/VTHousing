@@ -1,5 +1,63 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+
+const DOCUMENT_REQUIREMENTS = {
+  general: [
+    'Government-issued photo ID',
+    'Proof of enrollment or employment',
+    'Current address history'
+  ],
+  research: [
+    'Neighborhood research notes',
+    'Commute time estimates',
+    'Questions for landlord'
+  ],
+  viewing: [
+    'Scheduled tour confirmation',
+    'Transportation plan',
+    'Photo checklist for unit'
+  ],
+  documentation: [
+    'Pay stubs (last 2-3 months)',
+    'Bank statements (last 2-3 months)',
+    'Personal references contact list',
+    'Rental history summary'
+  ],
+  financial: [
+    'Budget worksheet',
+    'Utility cost estimates',
+    'Credit report copy'
+  ],
+  legal: [
+    'Lease review checklist',
+    "List of questions for property manager",
+    "Renter's insurance quotes"
+  ],
+  application: [
+    'Completed rental application form',
+    'Application fee receipt',
+    'Co-signer information (if needed)'
+  ],
+  communication: [
+    'Follow-up email template',
+    'Contact log for landlord/manager'
+  ],
+  insurance: [
+    "Renter's insurance policy details",
+    'Insurance provider contact information'
+  ],
+  logistics: [
+    'Moving day checklist',
+    'Utilities setup contact sheet',
+    'Change-of-address plan'
+  ]
+};
+
+const getDocumentsForTask = (task) => {
+  const categoryDocs = DOCUMENT_REQUIREMENTS[task.category] || [];
+  const generalDocs = DOCUMENT_REQUIREMENTS.general || [];
+  const combined = [...categoryDocs, ...generalDocs];
+  return Array.from(new Set(combined));
+};
 
 function Home() {
   const [search, setSearch] = useState("");
@@ -1214,6 +1272,7 @@ function ToDoCard({ rentalKey, data, onToggleTask, onRemove, updateTaskStatus })
   const completedTasks = data.tasks.filter(task => task.completed).length;
   const totalTasks = data.tasks.length;
   const progressPercentage = (completedTasks / totalTasks) * 100;
+  const [docModalState, setDocModalState] = useState({ open: false, task: null, checklist: {} });
   
   // Helper functions for the component
   const isTaskOverdue = (task) => {
@@ -1302,6 +1361,95 @@ function ToDoCard({ rentalKey, data, onToggleTask, onRemove, updateTaskStatus })
     
     return a.id - b.id;
   });
+
+  const buildMailtoLink = (task) => {
+    const subject = encodeURIComponent(`${task.task} - ${data.rental.name_of_rental}`);
+    const dueLine = task.dueDate ? `Due: ${formatDate(task.dueDate)}` : '';
+    const body = encodeURIComponent(
+      `Hi,\n\nI'm working on the rental application for ${data.rental.name_of_rental} (${data.rental.address}).\nTask: ${task.task}\n${dueLine}\n\nThanks,\n`
+    );
+    return `mailto:?subject=${subject}&body=${body}`;
+  };
+
+  const escapeICS = (value) => (value || '').toString().replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
+
+  const formatICSDate = (dateObj) => {
+    const iso = dateObj.toISOString().replace(/[-:]/g, '').split('.')[0];
+    return `${iso}Z`;
+  };
+
+  const getTaskEventTimes = (task) => {
+    const start = task.dueDate ? new Date(`${task.dueDate}T09:00:00`) : new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const end = new Date(start.getTime() + 60 * 60 * 1000);
+    return {
+      start,
+      end,
+      stamp: new Date()
+    };
+  };
+
+  const handleCalendarDownload = (task) => {
+    const { start, end, stamp } = getTaskEventTimes(task);
+    const summary = escapeICS(`${task.task} - ${data.rental.name_of_rental}`);
+    const description = escapeICS(
+      `Priority: ${task.priority || 'unspecified'}\nEstimated time: ${task.estimatedTime || 'unspecified'}\nStatus: ${task.status}`
+    );
+    const location = escapeICS(data.rental.address || 'Blacksburg, VA');
+    const uid = `${rentalKey}-${task.id}@hokiehomes`; 
+    const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Hokie Homes//EN\nBEGIN:VEVENT\nUID:${uid}\nDTSTAMP:${formatICSDate(stamp)}\nDTSTART:${formatICSDate(start)}\nDTEND:${formatICSDate(end)}\nSUMMARY:${summary}\nDESCRIPTION:${description}\nLOCATION:${location}\nEND:VEVENT\nEND:VCALENDAR`;
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${task.task.replace(/\s+/g, '_') || 'task'}-hokie-homes.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const openDocumentModal = (task) => {
+    const documents = getDocumentsForTask(task);
+    const checklist = documents.reduce((acc, doc) => {
+      acc[doc] = false;
+      return acc;
+    }, {});
+    setDocModalState({ open: true, task, checklist });
+  };
+
+  const toggleDocumentItem = (doc) => {
+    setDocModalState(prev => ({
+      ...prev,
+      checklist: {
+        ...prev.checklist,
+        [doc]: !prev.checklist[doc]
+      }
+    }));
+  };
+
+  const downloadChecklist = () => {
+    if (!docModalState.task) return;
+    const lines = Object.entries(docModalState.checklist).map(([doc, done]) => `- [${done ? 'x' : ' '}] ${doc}`);
+    const content = [
+      `Task: ${docModalState.task.task}`,
+      `Property: ${data.rental.name_of_rental}`,
+      `Address: ${data.rental.address}`,
+      '',
+      'Documents:',
+      ...lines
+    ].join('\n');
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${docModalState.task.task.replace(/\s+/g, '_')}_documents.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const closeDocumentModal = () => setDocModalState({ open: false, task: null, checklist: {} });
 
   return (
     <div style={{
@@ -1625,6 +1773,29 @@ function ToDoCard({ rentalKey, data, onToggleTask, onRemove, updateTaskStatus })
                   )}
                 </div>
               </div>
+
+              <div className="task-quick-actions">
+                <a
+                  href={buildMailtoLink(task)}
+                  className="task-action-link"
+                >
+                  📧 Email
+                </a>
+                <button
+                  type="button"
+                  className="task-action-button"
+                  onClick={() => handleCalendarDownload(task)}
+                >
+                  📅 Calendar
+                </button>
+                <button
+                  type="button"
+                  className="task-action-button"
+                  onClick={() => openDocumentModal(task)}
+                >
+                  📂 Documents
+                </button>
+              </div>
               
               {/* Status Change Buttons */}
               {!task.completed && (
@@ -1672,6 +1843,43 @@ function ToDoCard({ rentalKey, data, onToggleTask, onRemove, updateTaskStatus })
           );
         })}
       </div>
+      {docModalState.open && (
+        <div className="doc-modal-overlay" role="dialog" aria-modal="true" onClick={closeDocumentModal}>
+          <div className="doc-modal" onClick={e => e.stopPropagation()}>
+            <h4>Document Checklist</h4>
+            <p style={{ marginTop: '0.25rem', color: '#6c757d' }}>
+              Task: <strong>{docModalState.task?.task}</strong>
+            </p>
+            <p style={{ margin: '0.25rem 0 1rem 0', color: '#6c757d' }}>
+              Property: {data.rental.name_of_rental}
+            </p>
+            <div>
+              {Object.keys(docModalState.checklist || {}).length === 0 ? (
+                <p style={{ color: '#6c757d', fontStyle: 'italic' }}>No specific documents required. Review general paperwork.</p>
+              ) : (
+                Object.entries(docModalState.checklist).map(([doc, done]) => (
+                  <label key={doc} className="doc-checklist-item">
+                    <input
+                      type="checkbox"
+                      checked={done}
+                      onChange={() => toggleDocumentItem(doc)}
+                    />
+                    <span>{doc}</span>
+                  </label>
+                ))
+              )}
+            </div>
+            <div className="doc-modal-actions">
+              <button type="button" className="task-action-button" onClick={downloadChecklist}>
+                ⬇️ Download Checklist
+              </button>
+              <button type="button" className="task-action-button secondary" onClick={closeDocumentModal}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
