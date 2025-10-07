@@ -620,22 +620,20 @@ function Home() {
                     fontSize: 'clamp(1rem, 1.5vw, 1.2rem)', 
                     padding: 'clamp(0.6rem, 1.2vw, 0.75rem) clamp(0.6rem, 1.2vw, 0.75rem) clamp(0.6rem, 1.2vw, 0.75rem) 2rem', 
                     borderRadius: '8px', 
-                    border: '2px solid rgba(255,255,255,0.7)', 
+                    border: '2px solid #ddd', 
                     textAlign: 'left',
                     outline: 'none',
-                    transition: 'border-color 0.3s, background-color 0.3s',
+                    transition: 'border-color 0.3s',
                     boxSizing: 'border-box', 
                     backgroundColor: '#333',
                     color: '#ffffff',
                     caretColor: '#ffffff'
                   }}
                   onFocus={e => {
-                    e.target.style.borderColor = '#ffffff';
-                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                    e.target.style.borderColor = '#861f41';
                   }}
                   onBlur={e => {
-                    e.target.style.borderColor = 'rgba(255,255,255,0.7)';
-                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.12)';
+                    e.target.style.borderColor = '#ddd';
                   }}
                   min="0"
                   step="100"
@@ -740,18 +738,22 @@ function Home() {
                 flex: '1 1 auto',
                 maxWidth: '200px'
               }}
-              onMouseOver={e => {
+              onMouseEnter={e => {
                 if (canSearch && !loading) {
-                  e.target.style.backgroundColor = '#861f41';
+                  e.target.style.backgroundColor = '#a02851';
+                  e.target.style.borderColor = '#a02851';
                   e.target.style.color = '#ffffff';
                   e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 20px rgba(134, 31, 65, 0.4)';
                 }
               }}
-              onMouseOut={e => {
+              onMouseLeave={e => {
                 if (canSearch && !loading) {
                   e.target.style.backgroundColor = '#ffffff';
+                  e.target.style.borderColor = '#ffffff';
                   e.target.style.color = '#861f41';
                   e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 15px #333';
                 }
               }}
             >
@@ -775,18 +777,22 @@ function Home() {
                 flex: '1 1 auto',
                 maxWidth: '200px'
               }}
-              onMouseOver={e => {
+              onMouseEnter={e => {
                 if (canClear) {
-                  e.target.style.backgroundColor = '#ffffff';
-                  e.target.style.color = '#861f41';
-                  e.target.style.transform = 'translateY(0)';
-                }
-              }}
-              onMouseOut={e => {
-                if (canClear) {
-                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.backgroundColor = '#a02851';
+                  e.target.style.borderColor = '#a02851';
                   e.target.style.color = '#ffffff';
                   e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 20px rgba(134, 31, 65, 0.4)';
+                }
+              }}
+              onMouseLeave={e => {
+                if (canClear) {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.borderColor = '#ffffff';
+                  e.target.style.color = '#ffffff';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 15px #333';
                 }
               }}
             >
