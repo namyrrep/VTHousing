@@ -574,7 +574,7 @@ function Home() {
                 transition: 'border-color 0.3s',
                 boxSizing: 'border-box'
               }}
-              onFocus={e => e.target.style.borderColor = '#333'}
+              onFocus={e => e.target.style.borderColor = '#861f41'}
               onBlur={e => e.target.style.borderColor = '#ddd'}
             />
           </div>
